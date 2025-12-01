@@ -1,0 +1,86 @@
+import { useRef, useCallback } from 'react'
+import './CommanderDamage.css'
+
+function CommanderDamage({ player, playerIndex, allPlayers, onUpdateDamage, onClose }) {
+  const buttonTimeouts = useRef({})
+
+  const handleButtonClick = useCallback((callback, buttonId) => {
+    return (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      const now = Date.now()
+      const lastClick = buttonTimeouts.current[buttonId]
+
+      // Prevent double-trigger within 300ms
+      if (lastClick && now - lastClick < 300) {
+        return
+      }
+
+      // Record this click
+      buttonTimeouts.current[buttonId] = now
+
+      // Execute callback
+      callback()
+    }
+  }, [])
+
+  return (
+    <div className="commander-modal-overlay" onClick={onClose}>
+      <div className="commander-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="commander-header">
+          <h2>Commander Damage</h2>
+          <h3>{player.name}</h3>
+        </div>
+
+        <div className="commander-damage-list">
+          {allPlayers.map((opponent, opponentIndex) => {
+            if (opponentIndex === playerIndex) return null
+
+            const damage = player.commanderDamage[opponentIndex]
+            const isLethal = damage >= 21
+
+            return (
+              <div key={opponentIndex} className={`damage-row ${isLethal ? 'lethal' : ''}`}>
+                <div className="opponent-name">
+                  From {opponent.name}
+                </div>
+                <div className="damage-controls">
+                  <button
+                    className="dmg-btn"
+                    onPointerDown={handleButtonClick(() => onUpdateDamage(playerIndex, opponentIndex, -1), `cmdr-${opponentIndex}-1`)}
+                  >
+                    -
+                  </button>
+                  <div className="damage-value">
+                    {damage}
+                    {isLethal && <span className="lethal-tag">LETHAL</span>}
+                  </div>
+                  <button
+                    className="dmg-btn"
+                    onPointerDown={handleButtonClick(() => onUpdateDamage(playerIndex, opponentIndex, 1), `cmdr+${opponentIndex}+1`)}
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="quick-dmg-buttons">
+                  <button onPointerDown={handleButtonClick(() => onUpdateDamage(playerIndex, opponentIndex, -5), `cmdr-${opponentIndex}-5`)}>-5</button>
+                  <button onPointerDown={handleButtonClick(() => onUpdateDamage(playerIndex, opponentIndex, 5), `cmdr+${opponentIndex}+5`)}>+5</button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <button
+          className="close-btn"
+          onPointerDown={handleButtonClick(onClose, 'close')}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default CommanderDamage
