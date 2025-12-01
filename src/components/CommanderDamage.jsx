@@ -30,7 +30,7 @@ function CommanderDamage({ player, playerIndex, allPlayers, onUpdateDamage, onCl
       <div className="commander-modal" onClick={(e) => e.stopPropagation()}>
         <div className="commander-header">
           <h2>Commander Damage</h2>
-          <h3>{player.name}</h3>
+          <h3>{player.name || `P${playerIndex + 1}`}</h3>
         </div>
 
         <div className="commander-damage-list">
@@ -43,7 +43,7 @@ function CommanderDamage({ player, playerIndex, allPlayers, onUpdateDamage, onCl
             return (
               <div key={opponentIndex} className={`damage-row ${isLethal ? 'lethal' : ''}`}>
                 <div className="opponent-name">
-                  From {opponent.name}
+                  From {opponent.name || `P${opponentIndex + 1}`}
                 </div>
                 <div className="damage-controls">
                   <button

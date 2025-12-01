@@ -162,6 +162,54 @@
 
 
 
+.commander-damage-display {
+  display: flex;
+  gap: 4px;
+  min-height: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cmdr-dmg-spacer {
+  width: 40px;
+  height: 20px;
+}
+
+.cmdr-dmg-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  background: rgba(255, 68, 68, 0.2);
+  border: 1px solid #ff4444;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.cmdr-dmg-item.lethal {
+  background: rgba(255, 68, 68, 0.4);
+  border: 2px solid #ff4444;
+  box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+  animation: pulse-lethal 1.5s infinite;
+}
+
+@keyframes pulse-lethal {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.cmdr-player-label {
+  color: #fff;
+  font-size: 0.7rem;
+}
+
+.cmdr-dmg-value {
+  color: #ff4444;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
 .player-actions {
   display: flex;
   gap: 6px;
@@ -330,12 +378,26 @@
   .commander-damage-display {
     order: -1;
     min-height: 18px;
-    gap: 3px;
+    gap: 2px;
+  }
+
+  .cmdr-dmg-spacer {
+    width: 30px;
+    height: 16px;
   }
 
   .cmdr-dmg-item {
-    padding: 2px 5px;
+    padding: 2px 4px;
     font-size: 0.65rem;
+    gap: 2px;
+  }
+
+  .cmdr-player-label {
+    font-size: 0.6rem;
+  }
+
+  .cmdr-dmg-value {
+    font-size: 0.7rem;
   }
 
   .player-actions {

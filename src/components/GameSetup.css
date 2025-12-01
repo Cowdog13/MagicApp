@@ -89,12 +89,15 @@
   padding: 10px;
   border-radius: 8px;
   border: 2px solid #444;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .order-controls {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex-shrink: 0;
 }
 
 .order-btn {
@@ -121,16 +124,19 @@
   font-size: 1.2rem;
   color: #ffd700;
   min-width: 25px;
+  flex-shrink: 0;
 }
 
 .turn-order-item input {
   flex: 1;
+  min-width: 0;
   padding: 10px;
   font-size: 1rem;
   border: 1px solid #444;
   background: #1a1a1a;
   color: white;
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .start-button {

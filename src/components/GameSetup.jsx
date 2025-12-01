@@ -10,7 +10,7 @@ function GameSetup({ onStartGame }) {
 
   const handlePlayerNameChange = (index, name) => {
     const newNames = [...playerNames]
-    newNames[index] = name || `Player ${index + 1}`
+    newNames[index] = name
     setPlayerNames(newNames)
   }
 

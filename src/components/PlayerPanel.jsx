@@ -43,7 +43,7 @@ function PlayerPanel({
     <div className={`player-panel ${isActiveTimer ? 'active' : ''}`}>
       <div className="life-section">
         <div className="player-header">
-          <h2>{player.name}</h2>
+          <h2>{player.name || `P${playerIndex + 1}`}</h2>
           <div className="header-right">
             {totalCommanderDamage > 0 && (
               <span className="cmdr-total">⚔{totalCommanderDamage}</span>
@@ -78,6 +78,20 @@ function PlayerPanel({
           >
             +
           </button>
+        </div>
+
+        <div className="commander-damage-display">
+          {allPlayers.map((opponent, opponentIndex) => {
+            if (opponentIndex === playerIndex) return <div key={opponentIndex} className="cmdr-dmg-spacer"></div>
+            const damage = player.commanderDamage[opponentIndex]
+            if (damage === 0) return <div key={opponentIndex} className="cmdr-dmg-spacer"></div>
+            return (
+              <div key={opponentIndex} className={`cmdr-dmg-item ${damage >= 21 ? 'lethal' : ''}`}>
+                <span className="cmdr-player-label">P{opponentIndex + 1}</span>
+                <span className="cmdr-dmg-value">{damage}</span>
+              </div>
+            )
+          })}
         </div>
 
         <div className="player-actions">

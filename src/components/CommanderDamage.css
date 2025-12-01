@@ -180,58 +180,84 @@
 }
 
 @media (orientation: landscape) {
+  .commander-modal-overlay {
+    padding: 10px;
+  }
+
   .commander-modal {
-    max-width: 90vw;
-    max-height: 85vh;
-    padding: 15px;
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 8px;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .commander-header {
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+    padding-bottom: 5px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
   }
 
   .commander-header h2 {
-    font-size: 1.3rem;
-    margin: 0 0 5px 0;
+    font-size: 1rem;
+    margin: 0 0 3px 0;
   }
 
   .commander-header h3 {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   .commander-damage-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 10px;
-    margin-bottom: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px;
+    margin-bottom: 8px;
+    flex: 1;
+    overflow-y: auto;
+    align-content: start;
   }
 
   .damage-row {
-    padding: 10px;
+    padding: 6px;
+    gap: 6px;
   }
 
   .opponent-name {
-    font-size: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .damage-controls {
+    gap: 8px;
   }
 
   .damage-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
+  }
+
+  .lethal-tag {
+    font-size: 0.6rem;
+    margin-top: 2px;
   }
 
   .dmg-btn {
-    font-size: 1.3rem;
-    padding: 10px;
+    font-size: 1rem;
+    padding: 6px;
+  }
+
+  .quick-dmg-buttons {
+    gap: 4px;
   }
 
   .quick-dmg-buttons button {
-    padding: 8px;
-    font-size: 0.9rem;
+    padding: 5px;
+    font-size: 0.75rem;
   }
 
   .close-btn {
-    padding: 12px;
-    font-size: 1rem;
+    padding: 8px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
   }
 }
 
