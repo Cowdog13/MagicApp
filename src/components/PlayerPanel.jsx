@@ -37,17 +37,12 @@ function PlayerPanel({
     }
   }, [])
 
-  const totalCommanderDamage = player.commanderDamage.reduce((sum, damage) => sum + damage, 0)
-
   return (
     <div className={`player-panel ${isActiveTimer ? 'active' : ''}`}>
       <div className="life-section">
         <div className="player-header">
           <h2>{player.name || `P${playerIndex + 1}`}</h2>
           <div className="header-right">
-            {totalCommanderDamage > 0 && (
-              <span className="cmdr-total">⚔{totalCommanderDamage}</span>
-            )}
             {isCurrentTurn && !hasActivePriority && (
               <span className="turn-indicator">• Turn</span>
             )}

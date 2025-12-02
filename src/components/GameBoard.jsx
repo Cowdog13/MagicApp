@@ -103,8 +103,16 @@ function GameBoard({ config, onReset }) {
   const updateCommanderDamage = (receivingPlayer, dealingPlayer, delta) => {
     setPlayers(prev => {
       const updated = [...prev]
-      updated[receivingPlayer].commanderDamage[dealingPlayer] =
-        Math.max(0, updated[receivingPlayer].commanderDamage[dealingPlayer] + delta)
+      const oldDamage = updated[receivingPlayer].commanderDamage[dealingPlayer]
+      const newDamage = Math.max(0, oldDamage + delta)
+      const actualDelta = newDamage - oldDamage
+
+      // Update commander damage
+      updated[receivingPlayer].commanderDamage[dealingPlayer] = newDamage
+
+      // Also reduce life by the same amount
+      updated[receivingPlayer].life = Math.max(0, updated[receivingPlayer].life - actualDelta)
+
       return updated
     })
   }
