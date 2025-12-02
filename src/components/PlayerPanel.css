@@ -464,6 +464,17 @@
     flex: 1;
   }
 
+  /* Swap button order for players 2 and 4 in landscape to put priority on edges */
+  .player-2 .priority-btn-side,
+  .player-4 .priority-btn-side {
+    order: 2;
+  }
+
+  .player-2 .pass-turn-btn-side,
+  .player-4 .pass-turn-btn-side {
+    order: 1;
+  }
+
   .life-section {
     flex: 1.4;
   }
