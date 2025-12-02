@@ -1,8 +1,13 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useEffect } from 'react'
 import './CommanderDamage.css'
 
 function CommanderDamage({ player, playerIndex, allPlayers, onUpdateDamage, onClose }) {
   const buttonTimeouts = useRef({})
+  const openedAt = useRef(Date.now())
+
+  useEffect(() => {
+    openedAt.current = Date.now()
+  }, [])
 
   const handleButtonClick = useCallback((callback, buttonId) => {
     return (e) => {
@@ -25,8 +30,16 @@ function CommanderDamage({ player, playerIndex, allPlayers, onUpdateDamage, onCl
     }
   }, [])
 
+  const handleOverlayClick = (e) => {
+    // Prevent closing if modal was just opened (within 200ms)
+    if (Date.now() - openedAt.current < 200) {
+      return
+    }
+    onClose()
+  }
+
   return (
-    <div className="commander-modal-overlay" onClick={onClose}>
+    <div className="commander-modal-overlay" onClick={handleOverlayClick}>
       <div className="commander-modal" onClick={(e) => e.stopPropagation()}>
         <div className="commander-header">
           <h2>Commander Damage</h2>
