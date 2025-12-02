@@ -17,8 +17,8 @@ function CommanderDamage({ player, playerIndex, allPlayers, onUpdateDamage, onCl
       const now = Date.now()
       const lastClick = buttonTimeouts.current[buttonId]
 
-      // Prevent double-trigger within 300ms
-      if (lastClick && now - lastClick < 300) {
+      // Prevent double-trigger within 100ms
+      if (lastClick && now - lastClick < 100) {
         return
       }
 

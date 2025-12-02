@@ -24,8 +24,8 @@ function PlayerPanel({
       const now = Date.now()
       const lastClick = buttonTimeouts.current[buttonId]
 
-      // Prevent double-trigger within 300ms (handles both touch->mouse and rapid clicks)
-      if (lastClick && now - lastClick < 300) {
+      // Prevent double-trigger within 100ms (handles both touch->mouse and rapid clicks)
+      if (lastClick && now - lastClick < 100) {
         return
       }
 
