@@ -246,6 +246,17 @@
   flex-shrink: 0;
 }
 
+/* In portrait, swap button order for players 1 and 3 */
+.player-1 .priority-btn-side,
+.player-3 .priority-btn-side {
+  order: 2;
+}
+
+.player-1 .pass-turn-btn-side,
+.player-3 .pass-turn-btn-side {
+  order: 1;
+}
+
 .priority-btn-side {
   padding: 10px 6px;
   font-size: 0.85rem;
@@ -327,6 +338,12 @@
     flex-direction: row;
     padding: 4px;
     gap: 6px;
+  }
+
+  /* Players 2 and 4 have buttons on the left in landscape */
+  .player-panel.player-2,
+  .player-panel.player-4 {
+    flex-direction: row-reverse;
   }
 
   /* Left side - Life counter section */
@@ -437,8 +454,10 @@
     flex: 1;
   }
 
+  /* Reset button order in landscape - all players have same vertical layout */
   .priority-btn-side,
   .pass-turn-btn-side {
+    order: 0;
     padding: 10px 6px;
     font-size: 0.75rem;
     width: 100%;

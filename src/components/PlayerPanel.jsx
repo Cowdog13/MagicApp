@@ -37,8 +37,10 @@ function PlayerPanel({
     }
   }, [])
 
+  const playerPositionClass = `player-${playerIndex + 1}`
+
   return (
-    <div className={`player-panel ${isActiveTimer ? 'active' : ''}`}>
+    <div className={`player-panel ${isActiveTimer ? 'active' : ''} ${playerPositionClass}`}>
       <div className="life-section">
         <div className="player-header">
           <h2>{player.name || `P${playerIndex + 1}`}</h2>
