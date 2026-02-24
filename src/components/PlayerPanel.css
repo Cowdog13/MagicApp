@@ -55,6 +55,15 @@
   min-width: 0;
 }
 
+.player-number {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  margin-right: 4px;
+}
+
 .header-right {
   display: flex;
   align-items: center;

@@ -43,7 +43,7 @@ function PlayerPanel({
     <div className={`player-panel ${isActiveTimer ? 'active' : ''} ${playerPositionClass}`}>
       <div className="life-section">
         <div className="player-header">
-          <h2>{player.name || `P${playerIndex + 1}`}</h2>
+          <h2><span className="player-number">P{player.originalIndex + 1}</span> {player.name}</h2>
           <div className="header-right">
             {isCurrentTurn && !hasActivePriority && (
               <span className="turn-indicator">• Turn</span>
