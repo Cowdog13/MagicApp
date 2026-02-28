@@ -6,6 +6,7 @@ function PlayerPanel({
   playerIndex,
   isCurrentTurn,
   hasActivePriority,
+  isDead,
   onLifeChange,
   onTogglePriority,
   onOpenCommanderDamage,
@@ -40,7 +41,7 @@ function PlayerPanel({
   const playerPositionClass = `player-${playerIndex + 1}`
 
   return (
-    <div className={`player-panel ${isActiveTimer ? 'active' : ''} ${playerPositionClass}`}>
+    <div className={`player-panel ${isActiveTimer ? 'active' : ''} ${isDead ? 'dead' : ''} ${playerPositionClass}`}>
       <div className="life-section">
         <div className="player-header">
           <h2><span className="player-number">P{player.originalIndex + 1}</span> {player.name}</h2>
@@ -119,6 +120,12 @@ function PlayerPanel({
           </button>
         </div>
       </div>
+
+      {isDead && (
+        <div className="dead-overlay">
+          <div className="dead-text">DEAD</div>
+        </div>
+      )}
     </div>
   )
 }

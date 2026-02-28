@@ -86,6 +86,38 @@
   z-index: 100;
 }
 
+.pause-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  background: #0066cc;
+  color: white;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  min-height: 44px;
+}
+
+.pause-btn:hover {
+  background: #0077ee;
+}
+
+.pause-btn:active {
+  background: #0055bb;
+}
+
+.pause-btn.paused {
+  background: #28a745;
+}
+
+.pause-btn.paused:hover {
+  background: #34d058;
+}
+
 .reset-btn {
   flex: 1;
   padding: 12px;
@@ -126,6 +158,7 @@
     flex-shrink: 0;
   }
 
+  .pause-btn,
   .reset-btn {
     padding: 20px 8px;
     font-size: 0.85rem;
@@ -135,9 +168,89 @@
 }
 
 @media (max-width: 600px) and (orientation: portrait) {
-  .reset-btn {
+  .reset-btn,
+  .pause-btn {
     padding: 10px;
     font-size: 0.9rem;
     min-height: 40px;
+  }
+}
+
+/* First-player selection overlay */
+.first-player-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  touch-action: none;
+}
+
+.first-player-modal {
+  background: #1a1a1a;
+  border: 2px solid #ffd700;
+  border-radius: 12px;
+  padding: 28px 40px;
+  text-align: center;
+  max-width: 90vw;
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+}
+
+.first-player-modal h2 {
+  color: #ffd700;
+  font-size: 1.4rem;
+  margin: 0 0 20px 0;
+  letter-spacing: 1px;
+}
+
+.first-player-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.first-player-btn {
+  padding: 16px 24px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: 2px solid #ffd700;
+  background: #2a2a1a;
+  color: #ffd700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.first-player-btn:hover {
+  background: #3a3a1a;
+}
+
+.first-player-btn:active {
+  background: #4a4a1a;
+  transform: scale(0.97);
+}
+
+@media (orientation: landscape) {
+  .first-player-modal {
+    padding: 20px 32px;
+  }
+
+  .first-player-modal h2 {
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+  }
+
+  .first-player-btn {
+    padding: 12px 20px;
+    font-size: 0.95rem;
   }
 }

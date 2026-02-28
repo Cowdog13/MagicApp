@@ -17,18 +17,23 @@ function GameBoard({ config, onReset }) {
   const [activePriorityPlayer, setActivePriorityPlayer] = useState(null)
   const [showCommanderDamage, setShowCommanderDamage] = useState(false)
   const [selectedPlayerForCmdr, setSelectedPlayerForCmdr] = useState(null)
+  const [gamePhase, setGamePhase] = useState('selecting') // 'selecting' | 'playing'
+  const [timerPaused, setTimerPaused] = useState(false)
   const timerRef = useRef(null)
   const buttonTimeouts = useRef({})
 
   const activeTimerPlayer = activePriorityPlayer !== null ? activePriorityPlayer : currentTurnIndex
 
   useEffect(() => {
-    // Clear any existing timer
     if (timerRef.current) {
       clearInterval(timerRef.current)
+      timerRef.current = null
     }
 
-    // Create new timer
+    if (gamePhase !== 'playing' || timerPaused) {
+      return
+    }
+
     timerRef.current = setInterval(() => {
       setPlayers(prev => {
         const updated = [...prev]
@@ -39,13 +44,13 @@ function GameBoard({ config, onReset }) {
       })
     }, 1000)
 
-    // Cleanup function
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current)
+        timerRef.current = null
       }
     }
-  }, [activeTimerPlayer])
+  }, [activeTimerPlayer, gamePhase, timerPaused])
 
   const updateLife = (playerIndex, delta) => {
     setPlayers(prev => {
@@ -76,9 +81,23 @@ function GameBoard({ config, onReset }) {
     }
   }, [])
 
+  const selectFirstPlayer = (playerIndex) => {
+    setCurrentTurnIndex(playerIndex)
+    setGamePhase('playing')
+  }
+
   const passTurn = () => {
     setActivePriorityPlayer(null)
-    setCurrentTurnIndex((prev) => (prev + 1) % config.playerCount)
+    setCurrentTurnIndex((prev) => {
+      let next = (prev + 1) % config.playerCount
+      let attempts = 0
+      // Skip dead players (life < 1), but don't infinite loop if all are dead
+      while (players[next]?.life < 1 && attempts < config.playerCount) {
+        next = (next + 1) % config.playerCount
+        attempts++
+      }
+      return next
+    })
   }
 
   const togglePriority = (playerIndex) => {
@@ -133,6 +152,7 @@ function GameBoard({ config, onReset }) {
               playerIndex={index}
               isCurrentTurn={currentTurnIndex === index}
               hasActivePriority={activePriorityPlayer === index}
+              isDead={player.life < 1}
               onLifeChange={(delta) => updateLife(index, delta)}
               onTogglePriority={() => togglePriority(index)}
               onOpenCommanderDamage={() => openCommanderDamage(index)}
@@ -146,12 +166,37 @@ function GameBoard({ config, onReset }) {
 
       <div className="game-controls">
         <button
+          className={`pause-btn ${timerPaused ? 'paused' : ''}`}
+          onPointerDown={handleButtonClick(() => setTimerPaused(p => !p), 'pause')}
+        >
+          {timerPaused ? 'Resume Timer' : 'Pause Timer'}
+        </button>
+        <button
           className="reset-btn"
           onPointerDown={handleButtonClick(handleReset, 'reset')}
         >
           Reset Game
         </button>
       </div>
+
+      {gamePhase === 'selecting' && (
+        <div className="first-player-overlay">
+          <div className="first-player-modal">
+            <h2>Who goes first?</h2>
+            <div className="first-player-buttons">
+              {players.map((player, index) => (
+                <button
+                  key={index}
+                  className="first-player-btn"
+                  onPointerDown={() => selectFirstPlayer(index)}
+                >
+                  {player.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {showCommanderDamage && (
         <CommanderDamage
