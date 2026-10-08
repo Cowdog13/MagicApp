@@ -1,0 +1,198 @@
+diff --git a/src/components/GameBoard.css b/src/components/GameBoard.css
+index 8d93c72..606d7bc 100644
+--- a/src/components/GameBoard.css
++++ b/src/components/GameBoard.css
+@@ -239,6 +239,44 @@
+   transform: scale(0.97);
+ }
+ 
++.first-player-btn:disabled {
++  cursor: default;
++  opacity: 0.55;
++}
++
++.first-player-btn.rolling {
++  background: #ffd700;
++  color: #1a1a1a;
++  opacity: 1;
++  transform: scale(1.04);
++  transition: none;
++}
++
++.random-first-btn {
++  margin-top: 18px;
++  width: 100%;
++  padding: 14px 24px;
++  font-size: 1.1rem;
++  font-weight: bold;
++  border: 2px dashed #ffd700;
++  background: transparent;
++  color: #ffd700;
++  border-radius: 8px;
++  cursor: pointer;
++  user-select: none;
++  -webkit-user-select: none;
++  touch-action: manipulation;
++}
++
++.random-first-btn:active {
++  background: #2a2a1a;
++}
++
++.random-first-btn:disabled {
++  cursor: default;
++  opacity: 0.7;
++}
++
+ @media (orientation: landscape) {
+   .first-player-modal {
+     padding: 20px 32px;
+@@ -253,4 +291,10 @@
+     padding: 12px 20px;
+     font-size: 0.95rem;
+   }
++
++  .random-first-btn {
++    margin-top: 12px;
++    padding: 10px 20px;
++    font-size: 0.95rem;
++  }
+ }
+diff --git a/src/components/GameBoard.jsx b/src/components/GameBoard.jsx
+index 24a9740..26ea374 100644
+--- a/src/components/GameBoard.jsx
++++ b/src/components/GameBoard.jsx
+@@ -19,6 +19,11 @@ function GameBoard({ config, onReset }) {
+   const [selectedPlayerForCmdr, setSelectedPlayerForCmdr] = useState(null)
+   const [gamePhase, setGamePhase] = useState('selecting') // 'selecting' | 'playing'
+   const [timerPaused, setTimerPaused] = useState(false)
++  // How many turns each player has started (index matches players array)
++  const [turnCounts, setTurnCounts] = useState(() => Array(config.playerCount).fill(0))
++  // Player highlighted while the random pick is rolling (null when not rolling)
++  const [rollingIndex, setRollingIndex] = useState(null)
++  const rollTimeouts = useRef([])
+   const timerRef = useRef(null)
+   const buttonTimeouts = useRef({})
+ 
+@@ -81,23 +86,56 @@ function GameBoard({ config, onReset }) {
+     }
+   }, [])
+ 
++  const startTurnFor = (playerIndex) => {
++    setTurnCounts(prev => {
++      const updated = [...prev]
++      updated[playerIndex] += 1
++      return updated
++    })
++  }
++
+   const selectFirstPlayer = (playerIndex) => {
++    if (gamePhase !== 'selecting') return
+     setCurrentTurnIndex(playerIndex)
++    startTurnFor(playerIndex)
+     setGamePhase('playing')
+   }
+ 
++  // Cycle a highlight through the players, slowing down, then land on a random one
++  const selectRandomFirstPlayer = () => {
++    if (rollingIndex !== null) return
++    const count = players.length
++    const winner = Math.floor(Math.random() * count)
++    const start = Math.floor(Math.random() * count)
++    // At least two full laps, ending on the winner
++    const steps = count * 2 + ((winner - start + count) % count)
++    let delay = 0
++    for (let i = 0; i <= steps; i++) {
++      delay += 60 + Math.pow(i / steps, 3) * 260
++      const index = (start + i) % count
++      rollTimeouts.current.push(setTimeout(() => setRollingIndex(index), delay))
++    }
++    rollTimeouts.current.push(setTimeout(() => {
++      setRollingIndex(null)
++      selectFirstPlayer(winner)
++    }, delay + 700))
++  }
++
++  useEffect(() => {
++    return () => rollTimeouts.current.forEach(clearTimeout)
++  }, [])
++
+   const passTurn = () => {
+     setActivePriorityPlayer(null)
+-    setCurrentTurnIndex((prev) => {
+-      let next = (prev + 1) % config.playerCount
+-      let attempts = 0
+-      // Skip dead players (life < 1), but don't infinite loop if all are dead
+-      while (players[next]?.life < 1 && attempts < config.playerCount) {
+-        next = (next + 1) % config.playerCount
+-        attempts++
+-      }
+-      return next
+-    })
++    let next = (currentTurnIndex + 1) % config.playerCount
++    let attempts = 0
++    // Skip dead players (life < 1), but don't infinite loop if all are dead
++    while (players[next]?.life < 1 && attempts < config.playerCount) {
++      next = (next + 1) % config.playerCount
++      attempts++
++    }
++    setCurrentTurnIndex(next)
++    startTurnFor(next)
+   }
+ 
+   const togglePriority = (playerIndex) => {
+@@ -150,7 +188,8 @@ function GameBoard({ config, onReset }) {
+             <PlayerPanel
+               player={player}
+               playerIndex={index}
+-              isCurrentTurn={currentTurnIndex === index}
++              isCurrentTurn={gamePhase === 'playing' && currentTurnIndex === index}
++              turnNumber={turnCounts[index]}
+               hasActivePriority={activePriorityPlayer === index}
+               isDead={player.life < 1}
+               onLifeChange={(delta) => updateLife(index, delta)}
+@@ -187,13 +226,21 @@ function GameBoard({ config, onReset }) {
+               {players.map((player, index) => (
+                 <button
+                   key={index}
+-                  className="first-player-btn"
+-                  onPointerDown={() => selectFirstPlayer(index)}
++                  className={`first-player-btn ${rollingIndex === index ? 'rolling' : ''}`}
++                  onPointerDown={() => rollingIndex === null && selectFirstPlayer(index)}
++                  disabled={rollingIndex !== null}
+                 >
+                   {player.name}
+                 </button>
+               ))}
+             </div>
++            <button
++              className="random-first-btn"
++              onPointerDown={handleButtonClick(selectRandomFirstPlayer, 'random-first')}
++              disabled={rollingIndex !== null}
++            >
++              🎲 {rollingIndex !== null ? 'Rolling…' : 'Random'}
++            </button>
+           </div>
+         </div>
+       )}
+diff --git a/src/components/PlayerPanel.jsx b/src/components/PlayerPanel.jsx
+index a8b3829..92aca8e 100644
+--- a/src/components/PlayerPanel.jsx
++++ b/src/components/PlayerPanel.jsx
+@@ -5,6 +5,7 @@ function PlayerPanel({
+   player,
+   playerIndex,
+   isCurrentTurn,
++  turnNumber,
+   hasActivePriority,
+   isDead,
+   onLifeChange,
+@@ -47,7 +48,7 @@ function PlayerPanel({
+           <h2><span className="player-number">P{player.originalIndex + 1}</span> {player.name}</h2>
+           <div className="header-right">
+             {isCurrentTurn && !hasActivePriority && (
+-              <span className="turn-indicator">• Turn</span>
++              <span className="turn-indicator">• Turn {turnNumber}</span>
+             )}
+             {hasActivePriority && (
+               <span className="priority-indicator">• Priority</span>
