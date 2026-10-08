@@ -5,6 +5,7 @@ function PlayerPanel({
   player,
   playerIndex,
   isCurrentTurn,
+  turnNumber,
   hasActivePriority,
   isDead,
   onLifeChange,
@@ -47,7 +48,7 @@ function PlayerPanel({
           <h2><span className="player-number">P{player.originalIndex + 1}</span> {player.name}</h2>
           <div className="header-right">
             {isCurrentTurn && !hasActivePriority && (
-              <span className="turn-indicator">• Turn</span>
+              <span className="turn-indicator">• Turn {turnNumber}</span>
             )}
             {hasActivePriority && (
               <span className="priority-indicator">• Priority</span>

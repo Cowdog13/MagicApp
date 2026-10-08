@@ -19,6 +19,12 @@ function GameBoard({ config, onReset }) {
   const [selectedPlayerForCmdr, setSelectedPlayerForCmdr] = useState(null)
   const [gamePhase, setGamePhase] = useState('selecting') // 'selecting' | 'playing'
   const [timerPaused, setTimerPaused] = useState(false)
+  // Shared game turn number; increases each time play returns to the first player
+  const [turnNumber, setTurnNumber] = useState(1)
+  const [firstPlayerIndex, setFirstPlayerIndex] = useState(0)
+  // Player highlighted while the random pick is rolling (null when not rolling)
+  const [rollingIndex, setRollingIndex] = useState(null)
+  const rollTimeouts = useRef([])
   const timerRef = useRef(null)
   const buttonTimeouts = useRef({})
 
@@ -82,22 +88,50 @@ function GameBoard({ config, onReset }) {
   }, [])
 
   const selectFirstPlayer = (playerIndex) => {
+    if (gamePhase !== 'selecting') return
     setCurrentTurnIndex(playerIndex)
+    setFirstPlayerIndex(playerIndex)
+    setTurnNumber(1)
     setGamePhase('playing')
   }
 
+  // Cycle a highlight through the players, slowing down, then land on a random one
+  const selectRandomFirstPlayer = () => {
+    if (rollingIndex !== null) return
+    const count = players.length
+    const winner = Math.floor(Math.random() * count)
+    const start = Math.floor(Math.random() * count)
+    // At least two full laps, ending on the winner
+    const steps = count * 2 + ((winner - start + count) % count)
+    let delay = 0
+    for (let i = 0; i <= steps; i++) {
+      delay += 60 + Math.pow(i / steps, 3) * 260
+      const index = (start + i) % count
+      rollTimeouts.current.push(setTimeout(() => setRollingIndex(index), delay))
+    }
+    rollTimeouts.current.push(setTimeout(() => {
+      setRollingIndex(null)
+      selectFirstPlayer(winner)
+    }, delay + 700))
+  }
+
+  useEffect(() => {
+    return () => rollTimeouts.current.forEach(clearTimeout)
+  }, [])
+
   const passTurn = () => {
     setActivePriorityPlayer(null)
-    setCurrentTurnIndex((prev) => {
-      let next = (prev + 1) % config.playerCount
-      let attempts = 0
-      // Skip dead players (life < 1), but don't infinite loop if all are dead
-      while (players[next]?.life < 1 && attempts < config.playerCount) {
-        next = (next + 1) % config.playerCount
-        attempts++
-      }
-      return next
-    })
+    let next = (currentTurnIndex + 1) % config.playerCount
+    let attempts = 0
+    let passedFirst = next === firstPlayerIndex
+    // Skip dead players (life < 1), but don't infinite loop if all are dead
+    while (players[next]?.life < 1 && attempts < config.playerCount) {
+      next = (next + 1) % config.playerCount
+      if (next === firstPlayerIndex) passedFirst = true
+      attempts++
+    }
+    setCurrentTurnIndex(next)
+    if (passedFirst) setTurnNumber(n => n + 1)
   }
 
   const togglePriority = (playerIndex) => {
@@ -150,7 +184,8 @@ function GameBoard({ config, onReset }) {
             <PlayerPanel
               player={player}
               playerIndex={index}
-              isCurrentTurn={currentTurnIndex === index}
+              isCurrentTurn={gamePhase === 'playing' && currentTurnIndex === index}
+              turnNumber={turnNumber}
               hasActivePriority={activePriorityPlayer === index}
               isDead={player.life < 1}
               onLifeChange={(delta) => updateLife(index, delta)}
@@ -187,13 +222,21 @@ function GameBoard({ config, onReset }) {
               {players.map((player, index) => (
                 <button
                   key={index}
-                  className="first-player-btn"
-                  onPointerDown={() => selectFirstPlayer(index)}
+                  className={`first-player-btn ${rollingIndex === index ? 'rolling' : ''}`}
+                  onPointerDown={() => rollingIndex === null && selectFirstPlayer(index)}
+                  disabled={rollingIndex !== null}
                 >
                   {player.name}
                 </button>
               ))}
             </div>
+            <button
+              className="random-first-btn"
+              onPointerDown={handleButtonClick(selectRandomFirstPlayer, 'random-first')}
+              disabled={rollingIndex !== null}
+            >
+              🎲 {rollingIndex !== null ? 'Rolling…' : 'Random'}
+            </button>
           </div>
         </div>
       )}

@@ -239,6 +239,44 @@
   transform: scale(0.97);
 }
 
+.first-player-btn:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.first-player-btn.rolling {
+  background: #ffd700;
+  color: #1a1a1a;
+  opacity: 1;
+  transform: scale(1.04);
+  transition: none;
+}
+
+.random-first-btn {
+  margin-top: 18px;
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: 2px dashed #ffd700;
+  background: transparent;
+  color: #ffd700;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.random-first-btn:active {
+  background: #2a2a1a;
+}
+
+.random-first-btn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
 @media (orientation: landscape) {
   .first-player-modal {
     padding: 20px 32px;
@@ -251,6 +289,12 @@
 
   .first-player-btn {
     padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+
+  .random-first-btn {
+    margin-top: 12px;
+    padding: 10px 20px;
     font-size: 0.95rem;
   }
 }
